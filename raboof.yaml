@@ -1,0 +1,41 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: raboof-gateway
+spec:
+  selector:
+    istio: ingressgateway # use istio default controller
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "raboof.svc"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: raboof
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - raboof-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /foo
+      authority:
+        exact: raboof.svc
+    redirect:
+      authority: foo.svc
+      uri: /
+  - match:
+    - uri:
+        prefix: /bar
+      authority:
+        exact: raboof.svc
+    redirect:
+      authority: bar.svc
+      uri: /
